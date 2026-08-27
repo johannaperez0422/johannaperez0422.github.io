@@ -27,6 +27,7 @@ Versión estática, navegable e instalable del piloto de la Dirección de Invest
 - `manifest.webmanifest`: instalación móvil como PWA.
 - `sw.js`: funcionamiento básico sin conexión después de la primera visita.
 - `icon.svg`: icono de la maqueta.
+- `logo-fm-unc.jpeg`: logotipo institucional proporcionado por la Facultad de Medicina.
 - `.nojekyll`: publicación directa de archivos estáticos.
 
 ## Uso móvil

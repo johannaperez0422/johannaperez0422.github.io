@@ -46,8 +46,15 @@ button:focus-visible, input:focus-visible, dialog:focus-visible {
 
 .institution-mark { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .institution-mark > div:last-child { min-width: 0; }
-.mark { display: grid; place-items: center; flex: 0 0 auto; width: 48px; height: 48px; border-radius: 16px; background: var(--green-900); color: white; font-weight: 900; box-shadow: 0 5px 14px rgba(13, 76, 54, .18); }
-.compact .mark { width: 40px; height: 40px; border-radius: 13px; font-size: 13px; }
+.institution-logo {
+  flex: 0 0 auto;
+  width: 96px;
+  height: 58px;
+  object-fit: contain;
+  border-radius: 12px;
+  background: white;
+}
+.compact .institution-logo { width: 78px; height: 48px; }
 .compact .faculty { font-size: 19px; }
 
 .login-screen { min-height: 100vh; padding: 24px; display: grid; place-items: center; }
@@ -216,6 +223,7 @@ footer { margin-top: 36px; padding: 20px; border-top: 1px solid var(--line); bac
   .login-form { margin: 52px auto; }
   .login-form h2 { font-size: 28px; }
   .topbar-inner { height: 72px; padding: 0 14px; }
+  .compact .institution-logo { width: 68px; height: 42px; }
   .compact .university { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .compact .faculty { font-size: 17px; }
   .profile-copy { display: none; }
