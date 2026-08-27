@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0d4c36" />
+    <meta
+      name="description"
+      content="Maqueta pública del Sistema Integral de Gestión de Investigación de la Facultad de Medicina de la Universidad Nacional de Concepción."
+    />
+    <title>Sistema Integral de Investigación FM-UNC · Maqueta</title>
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <noscript>
+      <div class="noscript">Esta maqueta necesita JavaScript para funcionar.</div>
+    </noscript>
+
+    <main id="login-screen" class="login-screen">
+      <div class="login-frame">
+        <section class="login-story" aria-labelledby="story-title">
+          <span class="demo-pill">✦ Maqueta navegable</span>
+          <div>
+            <p class="story-kicker">Gestión integrada</p>
+            <h1 id="story-title">Investigación organizada, segura y trazable.</h1>
+            <p>
+              Un espacio institucional para acompañar proyectos, evidencias, revisiones
+              éticas, tutorías y comunicaciones desde una sola plataforma.
+            </p>
+          </div>
+          <div class="story-metrics" aria-label="Indicadores de demostración">
+            <div><strong>15</strong><span>Protocolos</span></div>
+            <div><strong>42</strong><span>Evidencias</span></div>
+            <div><strong>7</strong><span>Trabajos JJI</span></div>
+          </div>
+        </section>
+
+        <section class="login-panel">
+          <div class="institution-mark">
+            <div class="mark" aria-hidden="true">FM</div>
+            <div>
+              <p class="university">Universidad Nacional de Concepción</p>
+              <p class="faculty">Facultad de Medicina</p>
+              <p class="research">Dirección de Investigación</p>
+            </div>
+          </div>
+
+          <form id="demo-login" class="login-form">
+            <div>
+              <span class="access-pill">🔒 Acceso de demostración</span>
+              <h2>Sistema Integral de Investigación</h2>
+              <p>Esta maqueta utiliza registros ficticios y no se conecta con la base institucional.</p>
+            </div>
+            <label for="demo-email">Usuario de prueba</label>
+            <input id="demo-email" value="gestora.demo@fm-unc.edu.py" readonly />
+            <label for="demo-password">Contraseña</label>
+            <input id="demo-password" type="password" value="demostracion" readonly />
+            <button class="button button-primary button-block" type="submit">
+              Ingresar a la maqueta <span aria-hidden="true">→</span>
+            </button>
+            <p class="privacy-note">
+              No ingrese nombres reales, contraseñas institucionales ni documentos confidenciales.
+            </p>
+          </form>
+          <p class="pilot-note">Piloto visual · Semillero de Investigadores 2026</p>
+        </section>
+      </div>
+    </main>
+
+    <div id="app-shell" class="app-shell" hidden>
+      <header class="topbar">
+        <div class="topbar-inner">
+          <div class="institution-mark compact">
+            <div class="mark" aria-hidden="true">FM</div>
+            <div>
+              <p class="university">Universidad Nacional de Concepción</p>
+              <p class="faculty">Facultad de Medicina</p>
+              <p class="research">Dirección de Investigación</p>
+            </div>
+          </div>
+          <div class="profile">
+            <div class="profile-copy">
+              <strong>Gestora de demostración</strong>
+              <span>Administrador del piloto</span>
+            </div>
+            <span class="avatar" aria-hidden="true">GD</span>
+            <button id="logout" class="icon-button" type="button" aria-label="Cerrar demostración">↪</button>
+          </div>
+        </div>
+      </header>
+
+      <nav class="module-nav" aria-label="Módulos del sistema">
+        <div class="module-nav-inner">
+          <button data-view="inicio" class="nav-item active" type="button"><span>▦</span>Inicio</button>
+          <button data-view="proyectos" class="nav-item" type="button"><span>▤</span>Proyectos</button>
+          <button data-view="evidencias" class="nav-item" type="button"><span>▣</span>Evidencias</button>
+          <button data-view="etica" class="nav-item" type="button"><span>✓</span>Ética</button>
+          <button data-view="tutorias" class="nav-item" type="button"><span>◇</span>Tutorías</button>
+          <button data-view="evaluaciones" class="nav-item" type="button"><span>◎</span>Evaluaciones</button>
+          <button data-view="comunicaciones" class="nav-item" type="button"><span>◫</span>Avisos</button>
+        </div>
+      </nav>
+
+      <div class="page-wrap">
+        <div class="page-heading">
+          <div>
+            <p>Sistema integral</p>
+            <h1 id="view-title">Inicio</h1>
+          </div>
+          <span class="demo-mode">✦ Modo demostración · datos ficticios</span>
+        </div>
+        <section id="view-content" aria-live="polite"></section>
+      </div>
+
+      <footer>
+        Maqueta funcional sin conexión a datos reales · Dirección de Investigación FM-UNC
+      </footer>
+    </div>
+
+    <dialog id="demo-dialog" class="dialog">
+      <div class="dialog-head">
+        <div>
+          <p id="dialog-eyebrow">Ficha de demostración</p>
+          <h2 id="dialog-title">Detalle</h2>
+        </div>
+        <button id="dialog-close" class="icon-button" type="button" aria-label="Cerrar">×</button>
+      </div>
+      <div id="dialog-body" class="dialog-body"></div>
+      <div class="dialog-actions">
+        <button id="dialog-cancel" class="button button-secondary" type="button">Cerrar</button>
+        <button id="dialog-confirm" class="button button-primary" type="button" hidden>Simular registro</button>
+      </div>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <button id="install-app" class="install-button" type="button" hidden>Instalar aplicación</button>
+    <script src="app.js" defer></script>
+  </body>
+</html>
