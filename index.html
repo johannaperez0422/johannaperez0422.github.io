@@ -51,23 +51,31 @@
             </div>
           </div>
 
-          <form id="demo-login" class="login-form">
+          <div class="login-form">
             <div>
-              <span class="access-pill">🔒 Acceso de demostración</span>
+              <span class="access-pill">✦ Acceso de demostración</span>
               <h2>Sistema Integral de Investigación</h2>
-              <p>Esta maqueta utiliza registros ficticios y no se conecta con la base institucional.</p>
+              <p>Elija cómo desea recorrer el circuito piloto. Esta maqueta no guarda información real.</p>
             </div>
-            <label for="demo-email">Usuario de prueba</label>
-            <input id="demo-email" value="gestora.demo@fm-unc.edu.py" readonly />
-            <label for="demo-password">Contraseña</label>
-            <input id="demo-password" type="password" value="demostracion" readonly />
-            <button class="button button-primary button-block" type="submit">
-              Ingresar a la maqueta <span aria-hidden="true">→</span>
-            </button>
+            <div class="access-options" aria-label="Opciones de acceso a la maqueta">
+              <button id="applicant-entry" class="access-card" type="button">
+                <span class="access-card-icon">IN</span>
+                <span><strong>Inscribir un protocolo</strong><small>Recorrido de estudiante, docente o investigador</small></span>
+                <b aria-hidden="true">→</b>
+              </button>
+              <button id="team-entry" class="access-card" type="button">
+                <span class="access-card-icon">DI</span>
+                <span><strong>Ingresar como equipo de Investigación</strong><small>Mesa de entrada, control y seguimiento</small></span>
+                <b aria-hidden="true">→</b>
+              </button>
+            </div>
+            <a class="button button-secondary download-form" href="Formulario_Inscripcion_Protocolo_Investigacion_2025.docx" download>
+              ⇩ Descargar formulario institucional en Word
+            </a>
             <p class="privacy-note">
               No ingrese nombres reales, contraseñas institucionales ni documentos confidenciales.
             </p>
-          </form>
+          </div>
           <p class="pilot-note">Piloto visual · Semillero de Investigadores 2026</p>
         </section>
       </div>
@@ -90,8 +98,8 @@
           </div>
           <div class="profile">
             <div class="profile-copy">
-              <strong>Gestora de demostración</strong>
-              <span>Administrador del piloto</span>
+              <strong id="profile-name">Gestora de demostración</strong>
+              <span id="profile-role">Administrador del piloto</span>
             </div>
             <span class="avatar" aria-hidden="true">GD</span>
             <button id="logout" class="icon-button" type="button" aria-label="Cerrar demostración">↪</button>
@@ -102,6 +110,8 @@
       <nav class="module-nav" aria-label="Módulos del sistema">
         <div class="module-nav-inner">
           <button data-view="inicio" class="nav-item active" type="button"><span>▦</span>Inicio</button>
+          <button data-view="inscripcion" class="nav-item" type="button"><span>＋</span>Inscripción</button>
+          <button data-view="mesa" class="nav-item" type="button"><span>▥</span>Mesa de entrada</button>
           <button data-view="proyectos" class="nav-item" type="button"><span>▤</span>Proyectos</button>
           <button data-view="evidencias" class="nav-item" type="button"><span>▣</span>Evidencias</button>
           <button data-view="etica" class="nav-item" type="button"><span>✓</span>Ética</button>

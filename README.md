@@ -2,11 +2,22 @@
 
 Versión estática, navegable e instalable del piloto de la Dirección de Investigación de la Facultad de Medicina de la Universidad Nacional de Concepción.
 
+## Circuitos incluidos
+
+- Portal del solicitante para inscribir un protocolo en cinco etapas.
+- Descarga del formulario institucional en Word como alternativa.
+- Captura simulada de correo y teléfono para futuras notificaciones.
+- Mesa de entrada ficticia para revisión técnica y documental.
+- Estados de admisión, corrección solicitada y protocolo admitido.
+- Representación del futuro envío de una invitación de acceso de un solo uso.
+- Seguimiento de proyectos, evidencias, ética, tutorías, evaluaciones y avisos.
+
 ## Seguridad del piloto
 
 - Utiliza exclusivamente datos ficticios.
 - No contiene contraseñas, tokens, claves de API ni documentos institucionales.
 - No implementa autenticación real ni almacenamiento permanente.
+- No envía correos ni carga los archivos seleccionados en el formulario.
 - Los registros creados durante la navegación desaparecen al recargar la página.
 - No debe utilizarse todavía para información personal, clínica o institucional real.
 
@@ -28,6 +39,7 @@ Versión estática, navegable e instalable del piloto de la Dirección de Invest
 - `sw.js`: funcionamiento básico sin conexión después de la primera visita.
 - `icon.svg`: icono de la maqueta.
 - `logo-fm-unc.jpeg`: logotipo institucional proporcionado por la Facultad de Medicina.
+- `Formulario_Inscripcion_Protocolo_Investigacion_2025.docx`: formulario institucional en blanco para descarga.
 - `.nojekyll`: publicación directa de archivos estáticos.
 
 ## Uso móvil

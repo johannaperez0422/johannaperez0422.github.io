@@ -1,4 +1,4 @@
-const CACHE = "fm-unc-maqueta-v2";
+const CACHE = "fm-unc-maqueta-v3";
 const ASSETS = ["./", "./index.html", "./styles.css", "./app.js", "./manifest.webmanifest", "./icon.svg", "./logo-fm-unc.jpeg"];
 
 self.addEventListener("install", (event) => {

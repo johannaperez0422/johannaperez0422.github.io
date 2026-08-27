@@ -1,5 +1,7 @@
 const views = {
   inicio: "Inicio",
+  inscripcion: "Inscripción de protocolo",
+  mesa: "Mesa de entrada",
   proyectos: "Proyectos y protocolos",
   evidencias: "Evidencias documentales",
   etica: "Comité de Ética",
@@ -25,13 +27,25 @@ let evidence = [
 
 let demoNoticeAdded = false;
 let activeView = "inicio";
+let demoRole = "team";
+let formStep = 1;
+const applicantDraft = {};
+let submissions = [
+  { code: "SOL-DEMO-2026-003", title: "Calidad del sueño y desempeño académico", applicant: "Equipo de investigación B", date: "26/08/2026", status: "Por revisar", email: "equipo.demo@ejemplo.test", completeness: 82 },
+  { code: "SOL-DEMO-2026-002", title: "Prácticas preventivas en atención primaria", applicant: "Equipo de investigación C", date: "25/08/2026", status: "Corrección solicitada", email: "investigacion.demo@ejemplo.test", completeness: 68 },
+  { code: "SOL-DEMO-2026-001", title: "Adherencia terapéutica en población adulta", applicant: "Equipo de investigación A", date: "22/08/2026", status: "Admitido", email: "responsable.demo@ejemplo.test", completeness: 100 },
+];
 let deferredInstallPrompt = null;
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
+function escapeHtml(value = "") {
+  return String(value).replace(/[&<>"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[char]);
+}
+
 function statusTone(status) {
-  if (["Aprobado", "Vigente", "Completado"].includes(status)) return "ok";
-  if (["En revisión", "Programada"].includes(status)) return "info";
+  if (["Aprobado", "Vigente", "Completado", "Admitido"].includes(status)) return "ok";
+  if (["En revisión", "Programada", "Por revisar"].includes(status)) return "info";
   return "warn";
 }
 
@@ -157,7 +171,137 @@ function communicationsTemplate() {
   </div>`;
 }
 
-const templates = { inicio: dashboardTemplate, proyectos: projectsTemplate, evidencias: evidenceTemplate, etica: ethicsTemplate, tutorias: tutoringTemplate, evaluaciones: evaluationsTemplate, comunicaciones: communicationsTemplate };
+const protocolSteps = [
+  {
+    title: "Identificación",
+    description: "Datos de responsables y medios de contacto.",
+    fields: [
+      ["responsables", "Nombres y apellidos de los responsables", "textarea", "Un responsable por línea"],
+      ["coordinador", "Coordinador/a de la investigación", "text", "Nombre completo"],
+      ["celularCoordinador", "Celular del coordinador/a", "tel", "Ej.: 0981 000 000"],
+      ["tutor", "Tutor/a de la investigación", "text", "Nombre completo"],
+      ["celularTutor", "Celular del tutor/a", "tel", "Ej.: 0981 000 000"],
+      ["correo", "Correo principal para notificaciones", "email", "correo@ejemplo.test"],
+      ["telefono", "Teléfono alternativo de contacto", "tel", "Número de contacto"],
+      ["asignaturas", "Asignaturas involucradas", "text", "Asignatura o departamento"],
+      ["programa", "Programa", "select", "Grado|Postgrado"],
+      ["fecha", "Fecha de presentación", "date", ""],
+    ],
+  },
+  {
+    title: "Planteamiento",
+    description: "Definición académica y antecedentes del trabajo.",
+    fields: [
+      ["titulo", "Título de la investigación", "textarea", "Título provisorio"],
+      ["linea", "Línea de investigación", "text", "Línea institucional"],
+      ["pregunta", "Pregunta general", "textarea", "Pregunta principal"],
+      ["objetivoGeneral", "Objetivo general", "textarea", "Objetivo general"],
+      ["objetivosEspecificos", "Objetivos específicos", "textarea", "Un objetivo por línea"],
+      ["justificacion", "Justificación", "textarea", "Relevancia y aporte esperado"],
+      ["antecedentes", "Antecedentes de la investigación", "textarea", "Síntesis de antecedentes"],
+    ],
+  },
+  {
+    title: "Metodología",
+    description: "Diseño, población, variables y criterios.",
+    fields: [
+      ["materialMetodos", "Material y métodos", "textarea", "Enfoque general"],
+      ["diseno", "Diseño del estudio", "textarea", "Tipo y diseño"],
+      ["ambito", "Ámbito del estudio", "textarea", "Lugar y periodo"],
+      ["poblacion", "Población de estudio", "textarea", "Población objetivo"],
+      ["inclusion", "Criterios de inclusión", "textarea", "Un criterio por línea"],
+      ["exclusion", "Criterios de exclusión", "textarea", "Un criterio por línea"],
+      ["muestra", "Tamaño muestral", "textarea", "Cálculo o estimación"],
+      ["variables", "Variables del estudio", "textarea", "Variables previstas"],
+      ["dependientesPrincipales", "Variables dependientes principales", "textarea", "Desenlaces principales"],
+      ["dependientesSecundarias", "Variables dependientes secundarias", "textarea", "Desenlaces secundarios"],
+      ["definiciones", "Definiciones operacionales de desenlaces", "textarea", "Definiciones y medición"],
+    ],
+  },
+  {
+    title: "Análisis y ética",
+    description: "Recolección, análisis, control y viabilidad.",
+    fields: [
+      ["instrumento", "Instrumento de recolección de datos", "textarea", "Descripción del instrumento"],
+      ["procedimiento", "Procedimiento de recolección", "textarea", "Pasos de recolección"],
+      ["calidad", "Control de calidad de los datos", "textarea", "Controles previstos"],
+      ["analisis", "Plan de análisis estadístico", "textarea", "Métodos de análisis"],
+      ["faltantes", "Manejo de datos faltantes", "textarea", "Criterios de manejo"],
+      ["sesgos", "Sesgos y estrategias de control", "textarea", "Sesgos previstos y mitigación"],
+      ["etica", "Consideraciones éticas", "textarea", "Riesgos, consentimiento y confidencialidad"],
+      ["presupuesto", "Presupuesto y cronograma", "textarea", "Recursos, actividades y plazos"],
+      ["bibliografia", "Bibliografía", "textarea", "Referencias principales"],
+    ],
+  },
+  { title: "Anexos y envío", description: "Revise la solicitud y simule su presentación.", fields: [] },
+];
+
+function renderProtocolField([name, label, type, placeholder]) {
+  const value = escapeHtml(applicantDraft[name] || "");
+  if (type === "textarea") return `<label class="form-field form-field-wide"><span>${label}</span><textarea data-field="${name}" placeholder="${placeholder}">${value}</textarea></label>`;
+  if (type === "select") return `<label class="form-field"><span>${label}</span><select data-field="${name}"><option value="">Seleccione…</option>${placeholder.split("|").map((option) => `<option${value === option ? " selected" : ""}>${option}</option>`).join("")}</select></label>`;
+  return `<label class="form-field"><span>${label}</span><input data-field="${name}" type="${type}" value="${value}" placeholder="${placeholder}"></label>`;
+}
+
+function applicantSummary() {
+  const items = [
+    ["Responsable", applicantDraft.coordinador || "Sin completar"],
+    ["Correo", applicantDraft.correo || "Sin completar"],
+    ["Programa", applicantDraft.programa || "Sin completar"],
+    ["Título", applicantDraft.titulo || "Sin completar"],
+    ["Línea", applicantDraft.linea || "Sin completar"],
+    ["Tutor/a", applicantDraft.tutor || "Sin completar"],
+  ];
+  return `<div class="review-grid">${items.map(([label, value]) => `<div><span>${label}</span><strong>${escapeHtml(value)}</strong></div>`).join("")}</div>`;
+}
+
+function registrationTemplate() {
+  const step = protocolSteps[formStep - 1];
+  const stepLabels = protocolSteps.map((item, index) => `<button class="step-dot ${formStep === index + 1 ? "active" : ""} ${formStep > index + 1 ? "complete" : ""}" data-step="${index + 1}" type="button"><span>${formStep > index + 1 ? "✓" : index + 1}</span><small>${item.title}</small></button>`).join("");
+  const content = formStep < 5
+    ? `<div class="protocol-fields">${step.fields.map(renderProtocolField).join("")}</div>`
+    : `<div class="submission-review">
+        ${applicantSummary()}
+        <div class="upload-grid">
+          <label class="upload-card"><span>▣</span><strong>Protocolo completo</strong><small>PDF o DOCX · simulación</small><input class="demo-file" type="file" accept=".pdf,.doc,.docx"></label>
+          <label class="upload-card"><span>▤</span><strong>Instrumento de recolección</strong><small>PDF o DOCX · simulación</small><input class="demo-file" type="file" accept=".pdf,.doc,.docx"></label>
+        </div>
+        <label class="declaration"><input id="declaration" type="checkbox"> <span>Declaro que revisé la información y comprendo que esta maqueta no envía ni almacena datos reales.</span></label>
+      </div>`;
+  return `<div class="view registration-view">
+    ${sectionHead("Ruta de ingreso", "Inscripción de protocolo de investigación", "Complete la versión digital por etapas o descargue el formulario institucional en Word.", `<a class="button button-secondary" href="Formulario_Inscripcion_Protocolo_Investigacion_2025.docx" download>⇩ Descargar Word</a>`)}
+    <div class="alert privacy-alert"><span>i</span><div><strong>Formulario de demostración</strong><p>No use nombres, correos, teléfonos ni documentos reales. La versión funcional requerirá autenticación, base privada y envío institucional.</p></div></div>
+    <article class="panel protocol-panel">
+      <div class="stepper" aria-label="Etapas del formulario">${stepLabels}</div>
+      <div class="form-stage"><p class="section-eyebrow">Paso ${formStep} de 5</p><h2>${step.title}</h2><p>${step.description}</p>${content}</div>
+      <div class="form-actions">
+        <button id="form-back" class="button button-secondary" type="button" ${formStep === 1 ? "disabled" : ""}>← Anterior</button>
+        ${formStep < 5 ? `<button id="form-next" class="button button-primary" type="button">Guardar y continuar →</button>` : `<button id="submit-protocol" class="button button-primary" type="button">Simular presentación del protocolo</button>`}
+      </div>
+    </article>
+  </div>`;
+}
+
+function submissionRows() {
+  return submissions.map((item) => `<tr><td><strong>${item.code}</strong><br><small>${item.date}</small></td><td><b>${escapeHtml(item.title)}</b><br><small>${escapeHtml(item.applicant)}</small></td><td>${item.completeness}% ${progress(item.completeness)}</td><td>${status(item.status)}</td><td><button class="button button-secondary review-submission" data-code="${item.code}" type="button">Revisar</button></td></tr>`).join("");
+}
+
+function intakeTemplate() {
+  const pending = submissions.filter((item) => item.status === "Por revisar").length;
+  const corrections = submissions.filter((item) => item.status === "Corrección solicitada").length;
+  const admitted = submissions.filter((item) => item.status === "Admitido").length;
+  return `<div class="view">
+    ${sectionHead("Control interno", "Mesa de entrada de Investigación", "Bandeja ficticia para recibir, verificar, observar y admitir protocolos.", `<button class="button button-primary" data-go="inscripcion" type="button">＋ Nueva inscripción demo</button>`)}
+    <div class="stat-grid">${miniStat(submissions.length,"Solicitudes recibidas","IN")}${miniStat(pending,"Por revisar","?")}${miniStat(corrections,"Con correcciones","!")}${miniStat(admitted,"Admitidas","✓")}</div>
+    <article class="panel">
+      <div class="panel-head"><div><p class="section-eyebrow">Bandeja interna</p><h2>Solicitudes de protocolo</h2></div><span class="badge">Simulación local</span></div>
+      <div class="table-wrap"><table class="intake-table"><thead><tr><th>Solicitud</th><th>Trabajo</th><th>Integridad</th><th>Estado</th><th></th></tr></thead><tbody>${submissionRows()}</tbody></table></div>
+    </article>
+    <div class="workflow-note"><span>1</span><p><strong>Recepción</strong> del formulario y anexos</p><b>→</b><span>2</span><p><strong>Revisión</strong> técnica y documental</p><b>→</b><span>3</span><p><strong>Admisión</strong> y envío de invitación por correo</p></div>
+  </div>`;
+}
+
+const templates = { inicio: dashboardTemplate, inscripcion: registrationTemplate, mesa: intakeTemplate, proyectos: projectsTemplate, evidencias: evidenceTemplate, etica: ethicsTemplate, tutorias: tutoringTemplate, evaluaciones: evaluationsTemplate, comunicaciones: communicationsTemplate };
 
 function navigate(view, updateHash = true) {
   if (!views[view]) view = "inicio";
@@ -203,6 +347,15 @@ function exportEvidence() {
 
 function bindViewEvents() {
   $$('[data-go]').forEach((button) => button.addEventListener("click", () => navigate(button.dataset.go)));
+  if (activeView === "inscripcion") {
+    $$('[data-field]').forEach((field) => field.addEventListener("input", () => { applicantDraft[field.dataset.field] = field.value; }));
+    $$('.step-dot').forEach((button) => button.addEventListener("click", () => { formStep = Number(button.dataset.step); navigate("inscripcion", false); }));
+    $("#form-back")?.addEventListener("click", () => { if (formStep > 1) { formStep -= 1; navigate("inscripcion", false); } });
+    $("#form-next")?.addEventListener("click", () => { if (formStep < 5) { formStep += 1; navigate("inscripcion", false); } });
+    $$('.demo-file').forEach((input) => input.addEventListener("change", () => toast("Archivo seleccionado solo para la simulación; no se cargó.")));
+    $("#submit-protocol")?.addEventListener("click", simulateSubmission);
+  }
+  if (activeView === "mesa") bindSubmissionReview();
   if (activeView === "proyectos") {
     $("#project-search").addEventListener("input", (event) => {
       const query = event.target.value.toLowerCase();
@@ -230,6 +383,47 @@ function bindViewEvents() {
   if (activeView === "comunicaciones") $("#new-notice").addEventListener("click", () => { demoNoticeAdded = true; navigate("comunicaciones", false); toast("Aviso ficticio agregado temporalmente."); });
 }
 
+function simulateSubmission() {
+  if (!$("#declaration")?.checked) {
+    toast("Marque la declaración de demostración para continuar.");
+    return;
+  }
+  const code = `SOL-DEMO-2026-${String(submissions.length + 1).padStart(3, "0")}`;
+  submissions.unshift({
+    code,
+    title: applicantDraft.titulo || "Protocolo nuevo de demostración",
+    applicant: applicantDraft.coordinador || "Solicitante de demostración",
+    date: "Ahora",
+    status: "Por revisar",
+    email: applicantDraft.correo || "correo.demo@ejemplo.test",
+    completeness: 74,
+  });
+  showDialog({
+    eyebrow: "Presentación simulada",
+    title: `Solicitud ${code}`,
+    body: `<div class="success-message"><span>✓</span><h3>La solicitud ingresó a la mesa de entrada ficticia.</h3><p>En el sistema real, la Dirección revisaría el protocolo y enviaría al correo declarado una invitación de acceso de un solo uso. Aquí no se guardó ni se envió información.</p><button class="button button-secondary" data-dialog-go="mesa" type="button">Ver mesa de entrada</button></div>`,
+  });
+  $("[data-dialog-go]")?.addEventListener("click", () => { closeDialog(); demoRole = "team"; updateProfile(); navigate("mesa"); });
+}
+
+function bindSubmissionReview() {
+  $$('.review-submission').forEach((button) => button.addEventListener("click", () => {
+    const item = submissions.find((submission) => submission.code === button.dataset.code);
+    showDialog({
+      eyebrow: "Control de admisión",
+      title: item.code,
+      body: `<div class="info-list"><div class="info-row"><span>Trabajo</span><strong>${escapeHtml(item.title)}</strong></div><div class="info-row"><span>Solicitante</span><strong>${escapeHtml(item.applicant)}</strong></div><div class="info-row"><span>Canal de contacto</span><strong>${escapeHtml(item.email)}</strong></div><div class="info-row"><span>Estado</span><strong>${item.status}</strong></div></div><fieldset class="checklist"><legend>Lista de control ficticia</legend><label><input type="checkbox" checked> Identificación y contacto</label><label><input type="checkbox" checked> Planteamiento y objetivos</label><label><input type="checkbox"> Metodología completa</label><label><input type="checkbox"> Anexos e instrumento</label></fieldset><div class="review-actions"><button class="button button-secondary submission-action" data-action="Corrección solicitada" type="button">Solicitar corrección</button><button class="button button-primary submission-action" data-action="Admitido" type="button">Admitir y simular invitación</button></div>`,
+    });
+    $$('.submission-action', $("#dialog-body")).forEach((action) => action.addEventListener("click", () => {
+      item.status = action.dataset.action;
+      if (item.status === "Admitido") item.completeness = 100;
+      closeDialog();
+      navigate("mesa", false);
+      toast(item.status === "Admitido" ? "Admisión simulada. No se envió ningún correo." : "Solicitud marcada para corrección.");
+    }));
+  }));
+}
+
 function bindProjectDetails() {
   $$(".project-detail").forEach((button) => button.addEventListener("click", () => {
     const project = projects.find((p) => p.code === button.dataset.code);
@@ -241,21 +435,31 @@ function bindEvidenceOpen() {
   $$(".evidence-open").forEach((button) => button.addEventListener("click", () => toast("Demostración: la descarga real requerirá autorización temporal.")));
 }
 
-function enterDemo() {
+function updateProfile() {
+  const isApplicant = demoRole === "applicant";
+  $("#profile-name").textContent = isApplicant ? "Solicitante de demostración" : "Gestora de demostración";
+  $("#profile-role").textContent = isApplicant ? "Portal de inscripción" : "Equipo de Investigación";
+  $(".avatar").textContent = isApplicant ? "SD" : "GD";
+}
+
+function enterDemo(role = "team", destination = "inicio") {
+  demoRole = role;
   $("#login-screen").hidden = true;
   $("#app-shell").hidden = false;
+  updateProfile();
   const requested = location.hash.replace("#", "");
-  navigate(views[requested] ? requested : "inicio", false);
+  navigate(views[requested] ? requested : destination, false);
 }
 
 function leaveDemo() {
   $("#app-shell").hidden = true;
   $("#login-screen").hidden = false;
   history.replaceState(null, "", location.pathname);
-  $("#demo-email").focus();
+  $("#applicant-entry").focus();
 }
 
-$("#demo-login").addEventListener("submit", (event) => { event.preventDefault(); enterDemo(); });
+$("#applicant-entry").addEventListener("click", () => enterDemo("applicant", "inscripcion"));
+$("#team-entry").addEventListener("click", () => enterDemo("team", "mesa"));
 $("#logout").addEventListener("click", leaveDemo);
 $$(".nav-item").forEach((button) => button.addEventListener("click", () => navigate(button.dataset.view)));
 $("#dialog-close").addEventListener("click", closeDialog);
