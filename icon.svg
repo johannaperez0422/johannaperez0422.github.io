@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">Sistema Integral de Investigación FM-UNC</title>
+  <rect width="512" height="512" rx="116" fill="#0d4c36"/>
+  <path d="M92 116h328v280H92z" fill="#fff" opacity=".08"/>
+  <path d="M112 142h288v56H112zm0 86h182v142H112zm212 0h76v142h-76z" fill="#fff" opacity=".17"/>
+  <text x="256" y="321" fill="#fff" font-family="Arial Black,Arial,sans-serif" font-size="156" font-weight="900" text-anchor="middle">FM</text>
+</svg>
